@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>列表的移动和删除</title>
+    <style>
+        .list {
+            width: 400px;
+            border: 1px solid red;
+            background-color: pink;
+        }
+        .list ul {
+            margin: 10 auto;
+        }
+        .list ul li span{
+            cursor: pointer;
+        }
+        .btn {
+            color: yellow;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+        .btn::before {
+            content: '+';
+            display: inline-block;
+            margin-right: 3px;
+            font-size: 20px;
+            font-weight: bolder;
+        }
+        .btn1 {
+            margin-left: 20px;
+            width: 100%;
+            display: none;
+        }
+    </style>
+    <script src="./js/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <form class="list">
+        <ul class="list-items">
+            <li class="list-items-li">
+                    <input type="text" class="list-input" readonly="readonly" />
+                    <span class="up">[上移]</span>
+                    <span class="down">[下移]</span>
+                    <span class="del">[删除]</span>
+            </li>
+        </ul>
+        <span class="btn">添加项目</span>
+        <div class="btn1">
+            <input type="text" class="text"/>
+            <input type="button" value="确认" class="sub" />
+            <input type="button" value="取消" class="set"/>
+        </div>
+    </form>
+    <script>
+        // 点击添加项目显示添加框
+        $('.btn').on('click',function(){
+            $('.btn1').show();
+        });
+        // 点击取消添加框隐藏
+        $('.set').on('click',function(){
+            $('.btn1').hide();
+        });
+        // 初始化数据arr数组
+        var arr=['PHP','Javascript','HTML5','CSS3','Vue'];
+        // 拷贝li元素保存起来
+        var li=$('.list-items-li').clone(true);
+        // 清空li元素
+        $('.list-items-li').remove();
+        // 初始化arr数组，逐个添加到li元素里
+        for(var i=0;i<arr.length;i++){
+            // arr数组有多少数组，拷贝多少li元素
+            $('ul').append(li.clone(true));
+            // 将arr数组的数据逐个赋值个每一个li元素里的文本框
+            $('.list-input').eq(i).val(arr[i]);
+        }
+        $('.sub').on('click',function(){
+            // 点击确认拷贝新的li元素，添加到ul里
+            $('ul').append(li.clone(true));
+            // 获取最后li元素的最后一个文本框
+            var num=$('.list-input').length-1;
+            // 把添加框的文本框的值赋值给最后一个文本框赋值
+            $('.list-input').eq(num).val($('.text').val());
+            // 每次添加成功清空文本框的值
+            $('.text').val('');
+        });
+        // 上移按钮
+        $('ul').on('click','.up',function(e){
+            // 判断当前调用点击事件的li有没有上一个元素
+            if($(e.target).parent().prev().length>0){
+                // 有的话则将当前的li元素添加到它之前
+                $(e.target).parent().prev().before($(e.target).parent());
+            }else{
+                // 没有则提示已经是最上一个了
+                alert('已经是最上一个了');
+            }
+        });
+        // 下移按钮
+        $('ul').on('click','.down',function(e){
+            // 判断当前调用点击事件的li有没有下一个元素
+            if($(e.target).parent().next().length>0){
+                // 有的话则将当前的li元素添加到它之之后
+                $(e.target).parent().next().after($(e.target).parent());
+            }else{
+                // 没有则提示已经是最下一个了
+                alert('已经是最下一个了');
+            }
+        });
+        // 删除按钮
+        $('ul').on('click','.del',function(e){
+            // 判断li元素的个数，剩余一个则提示最后一个了
+            if($('li').length==1){
+                alert('最后一个了');
+            }
+            // 删除当前li元素
+            $(e.target).parent().remove();
+        });
+    </script>
+</body>
+</html>

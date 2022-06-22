@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>购物车</title>
+		<style>
+			section {
+				width: 900px;
+				padding: 3px 3px;
+				border: 1px solid #ccc;
+			}
+			table,th,tr {
+				font-weight: 400;
+			}
+			table thead th {
+				border-bottom: 1px solid pink;
+			}
+			table tbody td {
+				border-bottom: 1px solid pink;
+			}
+			table tfoot th {
+				border-bottom: 1px solid pink;
+			}
+			th,td {
+				width: 150px;
+				height: 30px;
+			}
+			tr {
+				text-align: center;
+				vertical-align: middle;
+			}
+			div {
+				position: relative;
+				width: 100px;
+				height: 30px;
+				display: flex;
+				text-align: center;
+				border: 1px solid #ccc;
+				margin: 0 auto;
+			}
+			div .jian {
+				width: 25%;
+				border: 0;
+				cursor: pointer;
+				background-color: white;
+				border-right: 1px solid #ccc;
+			}
+			div .jia {
+				width: 25%;
+				border: 0;
+				cursor: pointer;
+				border-left: 1px solid #ccc;
+				background-color: white;
+			}
+			div input {
+				width: 50px;
+				width: 50%;
+				border: 0;
+				outline: none;
+				text-align: center;
+			}		
+			a {
+				text-decoration: none;
+			}
+			tfoot {
+				height: 100px;
+			}
+			tfoot tr th{
+				font-weight: 400;
+				padding-right: 40px;
+				color: #999;
+			}
+			tfoot tr {
+				vertical-align: middle;
+			}
+			tbody tr>td:nth-child(5){
+				color: red;
+			}
+			tbody tr>td:nth-child(2){
+				color: blue;
+			}
+			.sub {
+				border: 0;
+				border-radius: 5px;
+				height: 30px;
+				background-color: rgb(241, 95, 11);
+				color: white;
+				margin-left: 10px;
+				cursor: pointer;
+			}
+			.zong {
+				color: red;
+			}
+			
+			.xuan {
+				vertical-align: middle;
+				margin: 0 3px;
+			}
+	  </style>
+	  <script src="./js/jquery-3.6.0.min.js"></script>
+	</head>
+	<body>
+		<section class="section">
+			<table cellspacing="0">
+				<thead>
+					<tr><th colspan="6" align="left">我的购物车</th></tr>
+					<tr>
+						<th><label><input type="checkbox" class="quan" checked="true">全选</label></th>
+						<th>商品</th>
+						<th>单价</th>
+						<th>数量</th>
+						<th>小计</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input class="checkbox" type="checkbox" checked="true"></td>
+						<td>long...</td>
+						<td class="dj">0</td>
+						<td>
+							<div>
+								<button type="button" class="jian">-</button>
+								<input type="text" class="nums"></input>
+								<button type="button" class="jia">+</button>
+							</div>
+						</td>
+						<td><span class="ji">0</span></td>
+						<td><a href="#">删除</a></td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr><th colspan="6" align="right">已选择<span class="xuan">0</span>件商品 总计：<span class="zong">0</span><input type="submit" value="提交订单" class="sub"></th></tr>
+				</tfoot>
+			</table>
+		</section>
+		<script>
+			var arr=[
+			{
+				uname:'Javascript实战',
+				danjia: 46.80,
+				num: 1,
+				sum: 46.80,
+			},    
+			{
+				uname:'HTML5',
+				danjia: 56.85,
+				num: 1,
+				sum: 56.85,
+			},
+			{
+				uname:'CSS3',
+				danjia: 66.90,
+				num: 1,
+				sum: 66.90,
+			},
+			{
+				uname:'Vue',
+				danjia: 99.99,
+				num: 1,
+				sum: 99.99,
+			}];
+			// 获取tr行元素，拷贝元素存储起来
+			var tr=$('tbody tr').clone(true);
+			// 清空tbody里面的子元素
+			$('tbody').empty();
+			// 初始化arr数组里面的数据
+			for(var i=0;i<arr.length;i++){
+				// 拷贝元素，添加元素到tbody元素里面
+				$('tbody').append(tr.clone(true));
+				// 将数组arr里面的数据赋值给新添加的元素中
+				$('tbody tr').eq(i).children("td").eq(1).html(arr[i].uname);
+				$('tbody tr').eq(i).children("td").eq(2).html(arr[i].danjia);
+				$('tbody tr').eq(i).children("td").eq(3).children('div').children('input').val(arr[i].num);
+				$('tbody tr').eq(i).children("td").eq(4).children('span').html(arr[i].sum);
+			};
+			var flag=0;
+			// 全选按钮
+			$('.quan').on('change',function(){
+				// 判断全选按钮状态
+				if($(this).prop('checked')){
+					// 为true就选中所有复选框
+					$('.checkbox').prop('checked','true');
+					// 选中所有复选框则计算总额跟件数
+					getnum();
+				}else {
+					// 为false就取消所有复选框
+					$('.checkbox').prop('checked','');
+					// 取消所有复选框则总额跟件数清空 为零
+					$('.xuan').html(0);
+					$('.zong').html(0);
+				}
+			});
+			// 判断所有子复选框的状态，如全部选中，则全选按钮选中
+			$('.checkbox').on('click',function(){
+				// :checked可以检查已选的复选框个数
+				if($('.checkbox:checked').length===$('.checkbox').length){
+					// 条件符合则给全选按钮选上
+					$('.quan').prop('checked',true);
+				}else{
+					// 否则不选
+					$('.quan').prop('checked',false);
+				}
+				if(!$(this).prop('checked')){
+					// 判断没有选中的商品 重新计算总额跟件数
+					// 当前调用点击事件的商品的件数跟金额，用总的件数和金额减去（就是当前商品不计算在总的件数跟金额里）
+					var sum=$(this).parents('tr').find('.nums').val();
+					var num=$(this).parents('tr').find('.ji').html();
+					$('.xuan').html($('.xuan').html()-sum);
+					$('.zong').html(($('.zong').html()-num).toFixed(2));
+				}else{
+					// 选中的商品 重新计算总额跟件数
+					// 当前调用点击事件的商品的件数跟金额，用总的件数和金额加上（就是当前商品要计算在总的件数跟金额里）
+					var sum=parseFloat($(this).parents('tr').find('.nums').val());
+					var num=parseFloat($(this).parents('tr').find('.ji').html());
+					$('.xuan').html(parseFloat($('.xuan').html())+sum);
+					$('.zong').html(parseFloat(parseFloat($('.zong').html())+num).toFixed(2));
+				}
+			});
+			// 点击删除商品
+			$('a').on('click',function(){
+				$(this).parents('tr').remove();
+				getnum();
+			})
+			// 开始给减按钮禁用，因为初始化只有一件
+			$('.jian').prop('disabled',true);
+			// 点击增加商品
+			$('.jia').on('click',function(){
+				$(this).parent().children('.jian').prop('disabled',false);
+				var num=$(this).parent().children('input').val();
+				++num;
+				$(this).parent().children('input').val(num);
+				var sum=$(this).parents('tr').children('.dj').html();
+				$(this).parents('tr').children().children('.ji').html(parseFloat(sum*num).toFixed(2));
+				getnum();
+			});
+			// 点击减少商品，最少一件
+			$('.jian').on('click',function(){
+				var num=$(this).parent().children('input').val();
+				--num;
+				$(this).parent().children('input').val(num);
+				var sum=$(this).parents('tr').children('.dj').html();
+				$(this).parents('tr').children().children('.ji').html(parseFloat(sum*num).toFixed(2));
+				if($(this).next('input').val()==1){
+					$(this).prop('disabled',true);
+				}
+				getnum();
+			});
+//			修改nums文本框数值
+			$('.nums').on('change',function(){
+				if($(this).val()!=0){
+					var num=$(this).val();
+					var sum=$(this).parents('tr').children('.dj').html();
+					$(this).parents('tr').children('td').children('.ji').html(parseFloat(num*sum).toFixed(2));
+					getnum();
+				}else {
+					return alert('请输入数量')
+				}
+			});
+			// 总的商品数和总额
+			function getnum(){
+				var num=0;
+				var sum=0;
+				$('.ji').each(function(i,em){
+					num+=parseFloat($(em).html());
+				});
+				$('.nums').each(function(i,em){
+					sum+=parseFloat($(em).val());
+				});
+				$('.xuan').html(sum);
+				$('.zong').html(num.toFixed(2));
+			};
+			getnum();
+		</script>
+	</body>
+</html>
